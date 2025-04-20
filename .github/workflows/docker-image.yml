@@ -16,13 +16,16 @@ jobs:
         with:
           node-version: '18.x'
       - name: Install dependencies
+        working-directory: nodejs-api/src
         run: |
           if [ -f package-lock.json ]; then
             npm ci
           else
             npm install
           fi
-      - run: npm test
+      - name: Run tests
+        working-directory: nodejs-api/src
+        run: npm test
 
   build-and-push:
     needs: test
