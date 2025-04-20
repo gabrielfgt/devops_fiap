@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  api:
+    image: ${DOCKERHUB_USERNAME}/nodejs-api:latest
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - PROD_MONGO_URI=mongodb://mongodb:27017/nodejs-api-prod
+    depends_on:
+      - mongodb
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - production-network
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    volumes:
+      - mongodb_prod_data:/data/db
+    restart: unless-stopped
+    networks:
+      - production-network
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+networks:
+  production-network:
+    driver: bridge
+
+volumes:
+  mongodb_prod_data: 
