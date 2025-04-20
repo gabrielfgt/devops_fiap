@@ -15,7 +15,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '18.x'
-      - run: npm ci
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            echo "package-lock.json not found, running npm install instead"
+            npm install
+          fi
       - run: npm test
 
   build-and-push:
